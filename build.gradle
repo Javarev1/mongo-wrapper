@@ -1,0 +1,35 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'dev.toolkit'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'org.mongodb:mongodb-driver-reactivestreams:4.11.1'
+    api 'io.projectreactor:reactor-core:3.6.3'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}

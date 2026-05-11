@@ -1,7 +1,5 @@
 # MongoDB Wrapper
 
----
-
 ## Features
 
 - **Single entry point** — `MongoWrapper.connect()` wires everything up

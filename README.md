@@ -1,43 +1,14 @@
-# Minecraft MongoDB Wrapper
-
-A production-grade MongoDB wrapper built for Minecraft server plugins. Supports both **Reactor** (Mono/Flux) and **CompletableFuture** APIs out of the box.
-
-> Made by **revqz**
-
----
+# MongoDB Wrapper
 
 ## Features
 
 - **Single entry point** — `MongoWrapper.connect()` wires everything up
 - **Dual API** — every operation available as Mono/Flux or CompletableFuture
-- **Custom BSON codec** — UUIDs as strings, Instants as BSON DateTime, no reflection
+- **BSON codec** — UUIDs as strings, Instants as BSON DateTime, no reflection
 - **Partial updates** — `$set` and `$inc` operators for high-frequency writes
-- **Fluent filter DSL** — type-safe queries without raw BSON strings
-- **Sensible defaults** — 20 pool size, 3s connect timeout, majority write concern
+- **Filter DSL** — type-safe queries without raw BSON strings
+- **Defaults** — 20 pool size, 3s connect timeout, majority write concern
 
----
-
-## Quick Start
-
-### Gradle Dependency
-
-```gradle
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'dev.toolkit:minecraft-mongo-wrapper:1.0.0'
-}
-```
-
-### Build From Source
-
-```bash
-./gradlew build
-```
-
----
 
 ## Setup
 
@@ -145,51 +116,6 @@ Bson advanced = PlayerFilter.where()
     .raw(Filters.exists("ip_hash"))
     .build();
 ```
-
----
-
-## Architecture
-
-```
-MongoWrapper                  ← entry point, holds client + pool
-├── MongoConfig               ← connection + pool settings (builder)
-├── PlayerCodecProvider       ← registers custom BSON codecs
-│   └── PlayerProfileCodec   ← encodes/decodes PlayerProfile ↔ BSON
-├── PlayerRepository          ← CRUD + partial updates + queries
-│   ├── Mono/Flux methods     ← reactive API
-│   └── *Future methods       ← CompletableFuture API
-├── PlayerFilter              ← fluent query DSL
-└── ReactiveAdapter           ← bridges Mono/Flux ↔ CompletableFuture
-```
-
----
-
-## Configuration
-
-| Field | Default | Description |
-|---|---|---|
-| `uri` | `mongodb://localhost:27017` | Connection URI (supports Atlas SRV) |
-| `database` | `minecraft` | Default database name |
-| `maxPoolSize` | `20` | Max connections per host |
-| `minPoolSize` | `2` | Idle connections kept warm |
-| `maxWaitTimeMs` | `5000` | Pool wait timeout |
-| `maxConnectionIdleTimeMs` | `60000` | Idle connection TTL |
-| `connectTimeoutMs` | `3000` | Socket connect timeout |
-| `socketTimeoutMs` | `10000` | Socket read timeout |
-
-Write concern is set to `MAJORITY` by default to prevent data loss on crashes.
-
----
-
-## Extending — Add a New Repository
-
-1. Annotate your model with `@MongoDocument(collection = "economy")`
-2. Write a codec implementing `Codec<EconomyAccount>`
-3. Register it in `PlayerCodecProvider` (or create a new provider)
-4. Create `EconomyRepository` following the same pattern
-5. Expose it from `MongoWrapper.economy()`
-
----
 
 ## License
 

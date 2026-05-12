@@ -29,21 +29,20 @@ public class PlayerRepository {
         ensureIndexes();
     }
 
+    // runs off main thread
     private void ensureIndexes() {
-        Mono.from(collection.createIndex(
-                Indexes.ascending("username"),
-                new IndexOptions().unique(true).background(true)
-        )).subscribe();
-
-        Mono.from(collection.createIndex(
-                Indexes.ascending("rank"),
-                new IndexOptions().background(true)
-        )).subscribe();
-
-        Mono.from(collection.createIndex(
-                Indexes.descending("last_seen"),
-                new IndexOptions().background(true)
-        )).subscribe();
+        Flux.merge(
+                Mono.from(collection.createIndex(
+                        Indexes.ascending("username"),
+                        new IndexOptions().unique(true).background(true))),
+                Mono.from(collection.createIndex(
+                        Indexes.ascending("rank"),
+                        new IndexOptions().background(true))),
+                Mono.from(collection.createIndex(
+                        Indexes.descending("last_seen"),
+                        new IndexOptions().background(true)))
+        ).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
+         .subscribe();
     }
 
     // reactive find operations

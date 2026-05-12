@@ -123,6 +123,12 @@ public class PlayerRepository {
                 .then();
     }
 
+    // batch insert in single round trip
+    public Mono<Void> insertMany(List<PlayerProfile> profiles) {
+        return ReactiveAdapter.fromPublisher(collection.insertMany(profiles))
+                .then();
+    }
+
     // partial field update via $set/$inc
     public Mono<Void> update(UUID uuid, Bson update) {
         return ReactiveAdapter.fromPublisher(
@@ -201,6 +207,10 @@ public class PlayerRepository {
 
     public CompletableFuture<Void> insertFuture(PlayerProfile profile) {
         return ReactiveAdapter.toFutureRaw(insert(profile));
+    }
+
+    public CompletableFuture<Void> insertManyFuture(List<PlayerProfile> profiles) {
+        return ReactiveAdapter.toFutureRaw(insertMany(profiles));
     }
 
     public CompletableFuture<Void> deleteFuture(UUID uuid) {

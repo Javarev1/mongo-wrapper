@@ -68,6 +68,13 @@ public class PlayerRepository {
                 )));
     }
 
+    // cheaper than full document fetch
+    public Mono<Boolean> existsByUUID(UUID uuid) {
+        return ReactiveAdapter.fromPublisher(
+                collection.countDocuments(Filters.eq("_id", uuid.toString()), new CountOptions().limit(1))
+        ).map(count -> count > 0);
+    }
+
     public Flux<PlayerProfile> findAll(PlayerFilter filter) {
         return ReactiveAdapter.fromPublisherMany(
                 collection.find(filter.build())
@@ -182,6 +189,10 @@ public class PlayerRepository {
 
     public CompletableFuture<List<PlayerProfile>> findAllFuture(PlayerFilter filter) {
         return ReactiveAdapter.toFutureList(findAll(filter));
+    }
+
+    public CompletableFuture<Boolean> existsByUUIDFuture(UUID uuid) {
+        return ReactiveAdapter.toFutureRaw(existsByUUID(uuid));
     }
 
     public CompletableFuture<PlayerProfile> saveFuture(PlayerProfile profile) {
